@@ -1,5 +1,11 @@
 # SBX · Sing-box 透明代理模块
 
+<p align="center">
+  <img src="assets/banner.jpg" alt="SBX Pro · Sing-box 透明代理模块" width="100%">
+</p>
+
+
+
 一个面向 KernelSU 的 Sing-box 透明代理模块：TUN 全局代理 + 智能分流 + 分应用管理 + 订阅管理，内置 WebUI。
 
 > English: A KernelSU module that runs sing-box in TUN mode with smart routing, per-app proxy rules, subscription management and a built-in WebUI.
