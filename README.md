@@ -26,7 +26,7 @@
 
 ## 安装
 
-1. 从 Releases 下载 `SBX-vX.Y.Z-module.zip`
+1. 从 Releases 下载 `SBX-vX.Y.Z-clean.zip`
 2. KernelSU 管理器 → 模块 → 从存储安装 → 重启
 3. 重启后打开 WebUI（模块卡片 → 打开 WebUI）
 
