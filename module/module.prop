@@ -1,0 +1,6 @@
+id=sbx_proxy
+name=SBX · Sing-box 透明代理
+version=1.6.0
+versionCode=6
+author=DSH
+description=Sing-box TUN 透明代理：自动分流、分应用管理、订阅管理、WebUI 管理，与 AdGuardHome/NekoBox 共存

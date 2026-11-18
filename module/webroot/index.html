@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>SBX · Sing-box</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#f4f6fb;--bg2:#eef1f8;--card:#ffffff;--line:#e6eaf2;--txt:#1b2130;--sub:#7b8496;--pri:#2f6bff;--pri2:#5b8cff;--ok:#12b76a;--bad:#ef4444;--warn:#f59e0b;--chip:#f1f4fa;--chip-txt:#4b5565;--log-bg:#0f1522;--log-txt:#b9c6e3;--shadow:0 6px 18px rgba(31,45,80,.06);--grid:#e9edf6}
+[data-theme="dark"]{--bg:#0f1218;--bg2:#0c0f14;--card:#161b24;--line:#232a36;--txt:#e6e9f0;--sub:#8b94a7;--pri:#5b8cff;--pri2:#7aa2ff;--ok:#22c55e;--bad:#f87171;--warn:#fbbf24;--chip:#1c2330;--chip-txt:#9aa4b8;--log-bg:#0a0e14;--log-txt:#9fb0cf;--shadow:0 6px 18px rgba(0,0,0,.35);--grid:#1a2029}
+html,body{background:var(--bg);color:var(--txt);font:14px/1.55 -apple-system,"PingFang SC","HarmonyOS Sans",sans-serif;transition:background .25s,color .25s}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px;padding:0 0 24px;min-height:100vh}
+.top{position:sticky;top:0;z-index:9;background:var(--bg);padding:12px 16px 6px}
+.hero{display:flex;align-items:center;justify-content:space-between}
+.hero h1{font-size:20px;letter-spacing:.5px;background:linear-gradient(90deg,var(--pri),#0ea5e9 75%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .s{color:var(--sub);font-size:10.5px;margin-top:0;letter-spacing:.6px}
+.pill{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:12px;transition:.2s}
+.dot{width:8px;height:8px;border-radius:50%;background:#c3c9d6}
+.dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(34,197,94,.15);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(34,197,94,.05)}}
+.tabs{display:flex;gap:4px;margin-top:10px;overflow:auto}
+.tab{flex:1;text-align:center;padding:7px 6px;border-radius:10px;font-size:13px;color:var(--sub);cursor:pointer;white-space:nowrap;transition:.15s}
+.tab.on{background:var(--card);color:var(--pri);font-weight:700;box-shadow:0 2px 8px rgba(47,107,255,.18)}
+.wrap{max-width:560px;margin:0 auto;padding:10px 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:11px;box-shadow:var(--shadow);transition:.2s}
+.card h2{font-size:12px;letter-spacing:1.2px;color:var(--sub);font-weight:600;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{padding:8px 10px;border-radius:11px;background:var(--chip);border:1px solid var(--line)}
+.stat .k{font-size:10.5px;color:var(--sub)}
+.stat .v{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px;font-weight:700;margin-top:1px}
+.stat .v.small{font-size:12px}
+.btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:9px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:11px;padding:9px 6px;font-size:13px;font-weight:600;color:var(--txt);cursor:pointer;text-align:center;transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:transparent;color:#fff;box-shadow:0 6px 14px rgba(47,107,255,.3)}
+.btn.danger{color:var(--bad);border-color:rgba(239,68,68,.35)}
+.btn.warn{color:var(--warn)}
+.inp{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px;outline:none;background:var(--bg2);color:var(--txt)}
+.inp:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(47,107,255,.12)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;gap:8px}
+.row+.row{border-top:1px solid var(--line)}
+.list{border:1px solid var(--line);border-radius:12px;margin-top:8px;overflow:auto;max-height:360px}
+.item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer}
+.item:last-child{border-bottom:0}
+.item:hover{background:var(--chip)}
+.item .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.radio{width:15px;height:15px;border-radius:50%;border:2px solid var(--sub);flex:none;position:relative}
+.item.sel .radio{border-color:var(--pri)}
+.item.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--pri)}
+.item.sel .nm{color:var(--pri);font-weight:600}
+.badge{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;padding:2px 7px;border-radius:7px;background:var(--chip);color:var(--chip-txt);border:1px solid var(--line);cursor:pointer;white-space:nowrap}
+.badge.ok{background:rgba(18,183,106,.12);color:var(--ok);border-color:rgba(18,183,106,.25)}
+.badge.bad{background:rgba(239,68,68,.1);color:var(--bad);border-color:rgba(239,68,68,.25)}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg2)}
+.seg div{flex:1;text-align:center;padding:8px 4px;font-size:12px;cursor:pointer;color:var(--sub);transition:.15s}
+.seg div.on{background:var(--card);color:var(--pri);font-weight:700;box-shadow:0 1px 6px rgba(47,107,255,.16)}
+.sw{position:relative;width:44px;height:26px;background:var(--line);border-radius:99px;transition:.2s;cursor:pointer;flex:none}
+.sw::after{content:"";position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on{background:var(--ok)}.sw.on::after{left:21px}
+.log{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;background:var(--log-bg);color:var(--log-txt);border-radius:12px;padding:10px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.muted{color:var(--sub);font-size:11.5px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.foot{text-align:center;color:var(--sub);font-size:11px;margin-top:6px;letter-spacing:.4px}
+.subrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.subrow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.subrow .u{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#17233d;color:#fff;font-size:13px;padding:9px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:99;pointer-events:none;max-width:86%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.show{opacity:1}
+.hide{display:none!important}
+.loading{color:var(--sub);font-size:12px;padding:12px;text-align:center}
+.ovl{position:fixed;inset:0;background:rgba(10,14,20,.45);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:98;color:#fff;font-size:13px}
+.ovl.show{display:flex}
+.sp{width:34px;height:34px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:97;display:none}
+.mask.show{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px 22px;z-index:98;transform:translateY(105%);transition:transform .25s;max-height:82vh;overflow:auto}
+.sheet.show{transform:translateY(0)}
+.sheet h3{font-size:16px;margin-bottom:2px}
+.sheet .suid{font-size:11px;color:var(--sub);font-family:ui-monospace,Menlo,Consolas,monospace}
+.opts{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;cursor:pointer;transition:.15s}
+.opt:active{transform:scale(.985)}
+.opt.on{border-color:var(--pri);background:rgba(47,107,255,.07)}
+.opt .t{font-size:13.5px;font-weight:600}
+.opt .d{font-size:11px;color:var(--sub);margin-top:1px}
+.opt .ck{width:17px;height:17px;border-radius:50%;border:2px solid var(--line);flex:none;position:relative}
+.opt.on .ck{border-color:var(--pri)}
+.opt.on .ck::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--pri)}
+.grp{border-bottom:1px solid var(--line)}
+.grp-h{display:flex;align-items:center;gap:8px;padding:9px 10px;cursor:pointer;font-size:12.5px;font-weight:700;background:var(--bg2)}
+.grp-h .c{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grp-h .n{font-size:10.5px;color:var(--sub);font-weight:400}
+.grp-b{display:none}
+.grp.open .grp-b{display:block}
+.grp-h .ar{transition:.2s;font-size:10px;color:var(--sub)}
+.grp.open .ar{transform:rotate(90deg)}
+.chipbar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chipbar .chip{padding:4px 10px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:11.5px;color:var(--chip-txt);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="top">
+ <div class="hero">
+  <div><h1>SBX · SING-BOX</h1><div class="s">TRANSPARENT PROXY · SMART ROUTING</div></div>
+  <div class="pill"><span class="dot" id="dot"></span><span id="pillTxt">…</span></div>
+ </div>
+ <div class="tabs" id="tabs">
+  <div class="tab on" data-p="p-hm">概览</div>
+  <div class="tab" data-p="p-nd">节点</div>
+  <div class="tab" data-p="p-ap">应用</div>
+    <div class="tab" data-p="p-st">设置</div>
+ </div>
+</div>
+<div class="wrap">
+<div id="p-hm">
+ <div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+   <div>
+    <div class="muted">当前状态</div>
+    <div style="font-size:24px;font-weight:800;letter-spacing:.5px" id="stateBig">—</div>
+   </div>
+   <div class="badge" id="modeChip" style="cursor:default">—</div>
+  </div>
+  <div class="grid2" style="margin-top:10px">
+   <div class="stat"><div class="k">运行时长</div><div class="v" id="uptime">—</div></div>
+   <div class="stat"><div class="k">当前节点</div><div class="v small" id="cur">—</div></div>
+   <div class="stat"><div class="k">下行 / 上行</div><div class="v small" id="traffic">—</div></div>
+   <div class="stat"><div class="k">连接 / 延迟</div><div class="v small" id="connDelay">—</div></div>
+  </div>
+  <div class="btns">
+   <div class="btn pri" onclick="act('start')">启 动</div>
+   <div class="btn danger" onclick="act('stop')">停 止</div>
+   <div class="btn warn" onclick="act('restart')">重 启</div>
+  </div>
+ </div>
+ <div class="card">
+  <h2>代理模式 <span class="badge" style="cursor:default" id="modeHint">—</span></h2>
+  <div class="seg" id="modeSeg">
+   <div data-m="rule" onclick="setMode('rule')">规则分流</div>
+   <div data-m="global" onclick="setMode('global')">全局代理</div>
+   <div data-m="direct" onclick="setMode('direct')">全部直连</div>
+  </div>
+ </div>
+</div>
+
+<div id="p-nd" class="hide">
+ <div class="card">
+  <h2>订阅管理</h2>
+  <div id="subList"><div class="loading">加载中…</div></div>
+  <input class="inp" id="subName" placeholder="名称（如 机场A）" style="margin:8px 0 6px">
+  <input class="inp" id="subUrl" placeholder="订阅链接（Clash 格式）" style="margin-bottom:8px">
+  <div class="btns" style="margin:0">
+   <div class="btn" onclick="addSub()">添加</div>
+   <div class="btn pri" onclick="updateSubs(0)">更新全部</div>
+   <div class="btn warn" onclick="updateSubs(1)">更新并重启</div>
+  </div>
+  <div class="muted" id="subInfo" style="margin-top:7px"></div>
+ </div>
+ <div class="card">
+  <h2>节点 <span class="badge" onclick="testAll()">全部测速</span></h2>
+  <input class="inp" id="nSearch" placeholder="搜索节点" oninput="renderNodes()">
+  <div class="list" id="nodeList"><div class="loading">加载中…</div></div>
+ </div>
+</div>
+
+<div id="p-ap" class="hide">
+ <div class="card">
+  <h2>分应用管理 <span class="badge" onclick="refreshLabels()">刷新应用名</span></h2>
+  <div class="muted" id="appModeTxt" style="margin-bottom:8px">—</div>
+  <div class="btns" style="margin:0 0 8px">
+   <div class="btn" onclick="allApps('proxy')">全部代理</div>
+   <div class="btn" onclick="allApps('direct')">全部直连</div>
+   <div class="btn" onclick="allApps('clear')">全部规则</div>
+  </div>
+  <input class="inp" id="aSearch" placeholder="搜索应用" oninput="renderApps()">
+  <div class="list" id="appList"><div class="loading">加载中…</div></div>
+ </div>
+</div>
+
+
+<div id="p-st" class="hide">
+ <div class="card">
+  <h2>设置</h2>
+  <div class="row"><div>开机自启</div><div class="sw" id="swAuto" onclick="toggleAuto()"></div></div>
+  <div class="row"><div>每日自动更新订阅</div><div class="sw" id="swSubs" onclick="toggleSubs()"></div></div>
+  <div class="row"><div>主题</div></div>
+  <div class="seg" id="themeSeg">
+   <div data-t="system" onclick="setTheme('system')">跟随系统</div>
+   <div data-t="light" onclick="setTheme('light')">浅色</div>
+   <div data-t="dark" onclick="setTheme('dark')">深色</div>
+  </div>
+  <div class="row" style="margin-top:6px"><div>代理模式</div><div class="mono" id="modeTxt">—</div></div>
+  <div class="row"><div>版本</div><div class="mono muted">SBX 1.3 · sing-box 1.14.4</div></div>
+ </div>
+ <div class="card">
+  <h2>运行日志 <span class="badge" onclick="loadLog()">刷新</span></h2>
+  <div class="log" id="log">点刷新查看</div>
+ </div>
+</div>
+<div class="foot">SBX · SING-BOX TRANSPARENT PROXY</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="ovl" id="ovl"><div class="sp"></div><div id="ovlTxt">处理中…</div></div>
+<div class="mask" id="mask" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+ <h3 id="shTitle">—</h3><div class="suid" id="shUid"></div>
+ <div class="muted" id="shCur" style="margin-top:8px;font-size:12px"></div>
+ <div class="opts" id="shOpts"></div>
+</div>
+<script>
+var SBX="/data/adb/sbx",MOD="/data/adb/modules/sbx_proxy",BB="/data/adb/ksu/bin/busybox";
+var _cb=0,Q=Promise.resolve(),NODES=[],APPS={mode:"rule",proxy:[],direct:[],block:[]},APP_LIST=[],LABELS={},SUBS=[],CUR="auto",DELAYS={},CACHE={};
+var MODES={rule:["规则分流","国内直连 / 国外代理"],global:["全局代理","所有流量走代理"],direct:["全部直连","代理不生效"]};
+var STATE_TXT={rule:["规则","按分流规则处理：国内直连，国外走代理"],proxy:["代理","此应用全部流量强制走代理"],direct:["直连","此应用全部流量直连（不走代理）"],block:["拒绝","此应用流量被拒绝（断网）"]};
+/* 主题 */
+function applyTheme(){var t=localStorage.getItem("sbx_theme")||"system";var dark=t==="dark"||(t==="system"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",dark?"dark":"light");document.querySelectorAll("#themeSeg div").forEach(function(d){d.className=(d.getAttribute("data-t")===t)?"on":"";});}
+function setTheme(t){localStorage.setItem("sbx_theme",t);applyTheme();toast("主题："+({system:"跟随系统",light:"浅色",dark:"深色"})[t]);}
+applyTheme();
+if(window.matchMedia){try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if((localStorage.getItem("sbx_theme")||"system")==="system")applyTheme();});}catch(e){}}
+/* 工具 */
+function sq(s){return "'"+String(s).replace(/'/g,"'\\''")+"'";}
+function $(id){return document.getElementById(id);}
+function toast(t){var e=$("toast");e.textContent=t;e.className="toast show";clearTimeout(window._tt);window._tt=setTimeout(function(){e.className="toast"},1800);}
+function busy(on,txt){$("ovlTxt").textContent=txt||"处理中…";$("ovl").className="ovl"+(on?" show":"");}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]});}
+function fmtUp(s){s=Number(s)||0;var h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h>0?h+"h "+m+"m":(m>0?m+"m "+(s%60)+"s":s+"s");}
+function fmtB(b){b=Number(b)||0;if(b>1048576)return (b/1048576).toFixed(1)+"M";if(b>1024)return (b/1024).toFixed(0)+"K";return b+"B";}
+function K(cmd,sec){sec=sec||12;var run=function(){return new Promise(function(res,rej){var name="sbxcb"+Date.now()+(++_cb);window[name]=function(e,o,er){delete window[name];res({errno:e,stdout:o||"",stderr:er||""});};try{window.ksu.exec("timeout "+sec+" sh -c "+sq(cmd),"{}",name);}catch(x){delete window[name];rej(x);}});};var p=Q.then(run,run);Q=p.catch(function(){});return p;}
+var TASKS={};
+function runTask(name,cmd,okMsg,cb){
+  if(TASKS[name])return toast("任务进行中…");
+  TASKS[name]=1;toast("已开始，后台执行中…");
+  K("sh "+MOD+"/sbxctl.sh task "+name+" "+sq(cmd),15).then(function(){
+    (function poll(){
+      setTimeout(async function(){
+        try{
+          var st=await K("sh "+MOD+"/sbxctl.sh taskstatus "+name,10);
+          if(/^done/.test(st.stdout)){delete TASKS[name];toast(okMsg||"完成");if(cb)cb(st.stdout.slice(5));}
+          else poll();
+        }catch(e){delete TASKS[name];toast("任务异常");}
+      },1500);
+    })();
+  }).catch(function(e){delete TASKS[name];toast("失败:"+e);});
+}
+async function writeFile(path,content){var b64=btoa(unescape(encodeURIComponent(content)));return K("printf '%s' '"+b64+"' | "+BB+" base64 -d > '"+path+"'",8);}
+/* 标签 */
+document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){
+  document.querySelectorAll(".tab").forEach(function(x){x.className="tab"});
+  t.className="tab on";var show=t.getAttribute("data-p");
+  ["p-hm","p-nd","p-ap","p-st"].forEach(function(id){$(id).className=(id===show)?"":"hide";});
+  if(show==="p-hm"){stopLog();loadStatus().catch(function(){});}
+  else if(show==="p-nd"){stopLog();loadSubs().catch(function(){});}
+  else if(show==="p-ap"){stopLog();loadApps().catch(function(){});}
+  else if(show==="p-st"){loadAuto().catch(function(){});startLog();}
+};});
+/* 概览 */
+async function loadStatus(){
+  var r=await K("sh "+MOD+"/sbxctl.sh status; echo '@@@'; sh "+MOD+"/sbxctl.sh now; echo '@@@'; sh "+MOD+"/sbxctl.sh nowauto; echo '@@@'; cat "+SBX+"/state/runtime.state 2>/dev/null",20);
+  var p=(r.stdout||"").split("@@@"),out=(p[0]||"").trim(),run=/running/.test(out);
+  $("dot").className="dot"+(run?" on":"");
+  $("pillTxt").textContent=run?"运行中":"已停止";
+  $("stateBig").textContent=run?"运行中":"已停止";
+  $("stateBig").style.color=run?"var(--ok)":"var(--sub)";
+  if(run){var m=out.match(/pid=(\d+)/);if(m)$("pid")&&0;var u=out.match(/uptime=(\d+)/);if(u)$("uptime").textContent=fmtUp(u[1]);}
+  else $("uptime").textContent="—";
+  CUR=((p[1]||"").trim())||"auto";
+  var AUTO=((p[2]||"").trim())||"";
+  var use=(CUR!=="auto")?CUR:AUTO;
+  var name=(CUR==="auto")?"自动测速":(CUR||"—"), sub="";
+  for(var i=0;i<NODES.length;i++){if(NODES[i].tag===use){name=NODES[i].name;sub=NODES[i].sub||"";break;}}
+  if(CUR==="auto"){name="自动测速 → "+name;}
+  $("cur").textContent=name+(sub?" · "+sub:"");
+  $("modeChip").textContent=(MODES[APPS.mode]||["—"])[0];
+  var dn=(p[3]||"").match(/dns=(\S+)/);
+  loadTraffic().catch(function(){});
+}
+async function loadTraffic(){
+  var r=await K("sh "+MOD+"/sbxctl.sh traffic",8);
+  try{var j=JSON.parse(r.stdout||"{}"),rx=0,tx=0,n=0;(j.connections||[]).forEach(function(c){rx+=c.download||0;tx+=c.upload||0;n++;});
+    $("traffic").textContent=fmtB(rx)+" / "+fmtB(tx);$("connDelay").textContent=n+" / "+(DELAYS[CUR]?(DELAYS[CUR]>0?DELAYS[CUR]+"ms":"超时"):"—");
+  }catch(e){$("traffic").textContent="—";$("connDelay").textContent="—";}
+}
+function act(a){runTask("ctl","sh "+MOD+"/sbxctl.sh "+a,({start:"已启动",stop:"已停止",restart:"已重启"})[a],function(){loadStatus().catch(function(){});});}
+async function setMode(m){if(APPS.mode===m||TASKS["ctl"])return;
+  APPS.mode=m;syncMode();
+  await writeFile(SBX+"/apps.json",JSON.stringify(APPS));
+  await writeFile(SBX+"/apps_rules.json",buildRules(APPS));
+  runTask("ctl","sh "+MOD+"/sbxctl.sh restart","模式已切换："+MODES[m][0],function(){CACHE.apps=0;loadStatus().catch(function(){});loadApps().catch(function(){});});
+}
+function syncMode(){document.querySelectorAll("#modeSeg div").forEach(function(d){d.className=(d.getAttribute("data-m")===APPS.mode)?"on":"";});
+ $("modeTxt").textContent=(MODES[APPS.mode]||["—"])[0]+" · "+((MODES[APPS.mode]||["",""])[1]);
+ $("modeHint").textContent=(MODES[APPS.mode]||["",""])[1];$("modeChip").textContent=(MODES[APPS.mode]||["—"])[0];
+ if($("appModeTxt"))$("appModeTxt").textContent="当前模式："+(MODES[APPS.mode]||["—"])[0]+" — "+((MODES[APPS.mode]||["",""])[1]);}
+/* 节点 */
+async function loadNodes(force){if(!force&&CACHE.nodes&&Date.now()-CACHE.nodes<20000)return;
+  var r=await K("cat "+SBX+"/nodes.json 2>/dev/null");try{NODES=JSON.parse(r.stdout||"[]");}catch(e){NODES=[];}
+  CACHE.nodes=Date.now();renderNodes();}
+function renderNodes(){
+  var q=($("nSearch").value||"").trim().toLowerCase(),groups={},order=[];
+  NODES.forEach(function(n){var g=n.sub||"默认";if(!groups[g]){groups[g]=[];order.push(g);}groups[g].push(n);});
+  var h='<div class="item'+(CUR==="auto"?" sel":"")+'" onclick="pickNode(\'auto\')"><div class="radio"></div><div class="nm">自动测速（推荐）</div><div class="tg">AUTO</div></div>';
+  order.forEach(function(g){
+    var list=groups[g].filter(function(n){return !q||n.name.toLowerCase().indexOf(q)>=0||n.tag.indexOf(q)>=0;});
+    if(!list.length)return;
+    var open=(window._openGrp&&window._openGrp[g])?true:(!q&&Object.keys(groups).length===1);
+    h+='<div class="grp'+(open?" open":"")+'"><div class="grp-h" onclick="toggleGrp(this)"><span class="ar">▶</span><span class="c">'+esc(g)+'</span><span class="n">'+list.length+' 个</span></div><div class="grp-b">';
+    list.forEach(function(n){
+      var d=DELAYS[n.tag];
+      var b=d?(d<0?'<span class="badge bad">超时</span>':'<span class="badge ok">'+d+'ms</span>'):'<span class="badge" onclick="event.stopPropagation();testNode(\''+n.tag+'\')">测速</span>';
+      h+='<div class="item'+(CUR===n.tag?" sel":"")+'" onclick="pickNode(\''+n.tag+'\')"><div class="radio"></div><div class="nm">'+esc(n.name)+'</div>'+b+'</div>';
+    });
+    h+="</div></div>";
+  });
+  $("nodeList").innerHTML=h;
+}
+function toggleGrp(el){el.parentNode.className="grp"+(el.parentNode.className.indexOf("open")>=0?"":" open");window._openGrp=window._openGrp||{};var g=el.querySelector(".c").textContent;window._openGrp[g]=el.parentNode.className.indexOf("open")>=0;}
+function pickNode(tag){if(tag===CUR||TASKS["ctl"])return;
+  runTask("ctl","sh "+MOD+"/sbxctl.sh node "+tag,"已切换节点",function(){loadStatus().catch(function(){});renderNodes();});}
+async function testNode(tag){DELAYS[tag]=0;renderNodes();
+  try{var r=await K("sh "+MOD+"/sbxctl.sh delay "+tag,12);var m=(r.stdout||"").match(/"delay":(\d+)/);DELAYS[tag]=m?parseInt(m[1]):-1;}catch(e){DELAYS[tag]=-1;}
+  renderNodes();}
+async function testAll(){if(!NODES.length)return;busy(true,"测速中 0/"+NODES.length);var done=0;
+  for(var i=0;i<NODES.length;i++){await testNode(NODES[i].tag);done++;$("ovlTxt").textContent="测速中 "+done+"/"+NODES.length;}
+  busy(false);toast("测速完成");}
+/* 应用 */
+async function loadApps(force){if(!force&&CACHE.apps&&Date.now()-CACHE.apps<20000){renderApps();return;}
+  var r=await K("cat "+SBX+"/apps.json 2>/dev/null; echo '@@@'; cat "+SBX+"/apps_labels.json 2>/dev/null");
+  var p=(r.stdout||"").split("@@@");
+  try{APPS=JSON.parse(p[0]||"{}");}catch(e){APPS={mode:"rule",proxy:[],direct:[],block:[]};}
+  APPS.proxy=APPS.proxy||[];APPS.direct=APPS.direct||[];APPS.block=APPS.block||[];APPS.mode=APPS.mode||"rule";
+  LABELS={};try{(JSON.parse(p[1]||"[]")||[]).forEach(function(a){LABELS[a.pkg]=a.label;});}catch(e){}
+  CACHE.apps=Date.now();await loadAppList();renderApps();syncMode();}
+async function loadAppList(){
+  var r=await K("cat /data/system/packages.list 2>/dev/null");
+  APP_LIST=[];
+  (r.stdout||"").split("\n").forEach(function(l){var p=l.trim().split(/\s+/);if(p.length<2)return;var uid=parseInt(p[1]);if(isNaN(uid)||uid<10000)return;APP_LIST.push({pkg:p[0],uid:uid,label:LABELS[p[0]]||p[0]});});
+  APP_LIST.sort(function(a,b){return a.label<b.label?-1:1;});
+}
+async function refreshLabels(){busy(true,"拉取应用名…");await K("sh "+MOD+"/sbxctl.sh labels",30);var r=await K("cat "+SBX+"/apps_labels.json 2>/dev/null");
+  try{LABELS={};(JSON.parse(r.stdout||"[]")||[]).forEach(function(a){LABELS[a.pkg]=a.label;});}catch(e){}
+  await loadAppList();renderApps();busy(false);toast("已更新应用名");}
+function appState(uid){if(APPS.proxy.indexOf(uid)>=0)return"proxy";if(APPS.direct.indexOf(uid)>=0)return"direct";if(APPS.block.indexOf(uid)>=0)return"block";return"rule";}
+function renderApps(){
+  var q=($("aSearch").value||"").trim().toLowerCase(),h="";
+  APP_LIST.forEach(function(a){var st=appState(a.uid);
+    if(q&&a.label.toLowerCase().indexOf(q)<0)return;
+    h+='<div class="item" onclick="openApp('+a.uid+')"><div class="nm">'+esc(a.label)+'</div><span class="badge'+(st!=="rule"?" ok":"")+'">'+STATE_TXT[st][0]+'</span></div>';
+  });
+  $("appList").innerHTML=h||'<div class="loading">无匹配</div>';
+}
+var SHEET_UID=0;
+function openApp(uid){
+  SHEET_UID=uid;var app=null;APP_LIST.forEach(function(a){if(a.uid===uid)app=a;});
+  if(!app)return;$("shTitle").textContent=app.label;$("shUid").textContent="UID "+uid;
+  var st=appState(uid);$("shCur").textContent="当前规则："+STATE_TXT[st][0]+" — "+STATE_TXT[st][1];
+  var opts="";["rule","proxy","direct","block"].forEach(function(k){opts+='<div class="opt'+(st===k?" on":"")+'" onclick="pickApp(\''+k+'\')"><div class="ck"></div><div><div class="t">'+STATE_TXT[k][0]+'</div><div class="d">'+STATE_TXT[k][1]+'</div></div></div>';});
+  $("shOpts").innerHTML=opts;$("mask").className="mask show";$("sheet").className="sheet show";
+}
+function closeSheet(){$("mask").className="mask";$("sheet").className="sheet";}
+async function pickApp(st){var uid=SHEET_UID;
+  ["proxy","direct","block"].forEach(function(k){var i=APPS[k].indexOf(uid);if(i>=0)APPS[k].splice(i,1);});
+  if(st!=="rule")APPS[st].push(uid);
+  closeSheet();toast("已设为："+STATE_TXT[st][0]);
+  await saveApps();renderApps();
+}
+function allApps(st){if(!confirm("确认批量修改全部应用的规则？"))return;
+  APPS.proxy=[];APPS.direct=[];APPS.block=[];
+  APP_LIST.forEach(function(a){if(st!=="clear")APPS[st].push(a.uid);});
+  renderApps();saveApps();}
+function buildRules(a){var parts=[];
+  if(a.proxy.length)parts.push('{"user_id":['+a.proxy.join(",")+'],"outbound":"proxy"}');
+  if(a.direct.length)parts.push('{"user_id":['+a.direct.join(",")+'],"outbound":"direct"}');
+  if(a.block.length)parts.push('{"user_id":['+a.block.join(",")+'],"outbound":"reject"}');
+  return parts.length?parts.join(","):'{"user_id":[-1],"outbound":"direct"}';}
+async function saveApps(silent){
+  await writeFile(SBX+"/apps.json",JSON.stringify(APPS));
+  await writeFile(SBX+"/apps_rules.json",buildRules(APPS));
+  syncMode();
+  runTask("ctl","sh "+MOD+"/sbxctl.sh restart","应用规则已生效",function(){loadStatus().catch(function(){});});
+}
+/* 订阅 */
+async function loadSubs(force){if(!force&&CACHE.subs&&Date.now()-CACHE.subs<20000)return;
+  var r=await K("cat "+SBX+"/subs.txt 2>/dev/null");
+  SUBS=(r.stdout||"").split("\n").filter(function(l){return l.indexOf("|")>0;}).map(function(l){var i=l.indexOf("|");return{name:l.slice(0,i),url:l.slice(i+1)};});
+  await loadNodes(true);var counts={};NODES.forEach(function(n){counts[n.sub||"默认"]=(counts[n.sub||"默认"]||0)+1;});
+  var h="";SUBS.forEach(function(s,i){h+='<div class="subrow"><div class="nm">'+esc(s.name)+'</div><span class="badge">'+(counts[s.name]||0)+' 节点</span><span class="badge bad" onclick="delSub('+i+')">删除</span></div>';});
+  $("subList").innerHTML=h||'<div class="muted" style="padding:4px 0">还没有订阅</div>';
+  CACHE.subs=Date.now();}
+async function addSub(){var n=($("subName").value||"").trim(),u=($("subUrl").value||"").trim();if(!n||!u)return toast("请填写名称和链接");
+  if(n.indexOf("|")>=0)return toast("名称不能包含 |");
+  var lines=SUBS.map(function(s){return s.name+"|"+s.url;});
+  if(lines.some(function(l){return l.split("|")[0]===n;}))return toast("名称重复");
+  lines.push(n+"|"+u);
+  await writeFile(SBX+"/subs.txt",lines.join("\n")+"\n");
+  $("subName").value="";$("subUrl").value="";CACHE.subs=0;CACHE.nodes=0;CACHE.apps=0;
+  await loadSubs(true);toast("已添加，点「更新全部」生效");}
+async function delSub(i){var s=SUBS[i];if(!s)return;if(!confirm("删除订阅 "+s.name+"？"))return;
+  var lines=SUBS.filter(function(x){return x.name!==s.name;}).map(function(x){return x.name+"|"+x.url;});
+  await writeFile(SBX+"/subs.txt",lines.join("\n")+(lines.length?"\n":""));
+  CACHE.subs=0;CACHE.nodes=0;await loadSubs(true);toast("已删除");}
+function updateSubs(restart){
+  var cmd="sh "+MOD+"/sbxctl.sh subs"+(restart?"; sh "+MOD+"/sbxctl.sh restart":"");
+  runTask("subs",cmd,restart?"订阅已更新并重启":"订阅已更新",function(out){
+    var lines=(out||"").split("\n").filter(function(l){return l.indexOf("SUB|")===0;});
+    var info=lines.map(function(l){var p=l.split("|");return p[1]+"："+(isNaN(parseInt(p[2]))?"失败":parseInt(p[2])+" 节点");}).join("；");
+    $("subInfo").textContent=info||"更新完成";
+    CACHE.subs=0;CACHE.nodes=0;loadSubs(true).catch(function(){});loadStatus().catch(function(){});
+  });}
+/* 设置 */
+async function loadAuto(){var r=await K("cat "+SBX+"/settings.prop 2>/dev/null");var s=r.stdout||"";
+  $("swAuto").className="sw"+(/autostart=1/.test(s)?" on":"");
+  $("swSubs").className="sw"+(/subs_auto=1/.test(s)?" on":"");}
+async function toggleAuto(){var on=$("swAuto").className.indexOf("on")>=0,v=on?"0":"1";
+  var cur=await K("cat "+SBX+"/settings.prop 2>/dev/null");var subs=/subs_auto=1/.test(cur.stdout||"")?"1":"0";
+  await writeFile(SBX+"/settings.prop","autostart="+v+"\nsubs_auto="+subs+"\n");
+  $("swAuto").className="sw"+(v==="1"?" on":"");toast(v==="1"?"已开启自启":"已关闭自启");}
+async function toggleSubs(){var on=$("swSubs").className.indexOf("on")>=0,v=on?"0":"1";
+  var cur=await K("cat "+SBX+"/settings.prop 2>/dev/null");var auto=/autostart=1/.test(cur.stdout||"")?"1":"0";
+  await writeFile(SBX+"/settings.prop","autostart="+auto+"\nsubs_auto="+v+"\n");
+  $("swSubs").className="sw"+(v==="1"?" on":"");toast(v==="1"?"已开启每日更新":"已关闭每日更新");}
+async function loadLog(){try{var r=await K("sh "+MOD+"/sbxctl.sh log 100",8);$("log").textContent=(r.stdout||"").trim()||"（空）";$("log").scrollTop=$("log").scrollHeight;}catch(e){$("log").textContent="读取失败";}}
+var LOG_T=null;
+function startLog(){if(LOG_T)return;loadLog();LOG_T=setInterval(function(){if($("p-st").className.indexOf("hide")>=0){stopLog();return;}loadLog();},2000);}
+function stopLog(){if(LOG_T){clearInterval(LOG_T);LOG_T=null;}}
+/* 启动 */
+(async function(){
+  syncMode();applyTheme();
+  loadStatus().catch(function(){});loadNodes(true).catch(function(){});
+  setInterval(function(){if(!$("p-hm").className.indexOf("hide"))loadStatus().catch(function(){});},30000);
+})();
+</script>
+</body>
+</html>

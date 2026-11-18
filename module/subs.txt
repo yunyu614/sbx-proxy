@@ -1,0 +1,2 @@
+# 在此文件按「名称|链接」每行一条添加订阅，或在 WebUI 订阅页添加
+# 示例：我的机场|https://example.com/subscribe?clash=1

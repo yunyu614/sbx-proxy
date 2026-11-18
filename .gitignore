@@ -1,0 +1,7 @@
+build/
+module/sing-box
+module/tool.dex
+*.zip
+.DS_Store
+.idea/
+.vscode/
